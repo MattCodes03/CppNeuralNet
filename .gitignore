@@ -1,0 +1,30 @@
+# Build folders
+/build/
+/cmake-build-debug/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+
+# Object files and executables
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# Visual Studio Code settings
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# Mac system files
+.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Backup files
+*~
