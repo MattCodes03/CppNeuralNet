@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/matthew/Projects/NueralNetwork/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

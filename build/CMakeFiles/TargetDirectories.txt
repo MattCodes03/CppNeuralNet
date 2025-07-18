@@ -1,0 +1,3 @@
+/home/matthew/Projects/NueralNetwork/build/CMakeFiles/NueralNetwork.dir
+/home/matthew/Projects/NueralNetwork/build/CMakeFiles/edit_cache.dir
+/home/matthew/Projects/NueralNetwork/build/CMakeFiles/rebuild_cache.dir
