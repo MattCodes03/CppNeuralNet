@@ -1,36 +1,52 @@
 #include <iostream>
 #include "Matrix/Matrix.h"
 #include "Activation/Activation.h"
+#include "Layers/Dense.h"
+#include "Net/NeuralNetwork.h"
+#include "Net/Loss.h"
 
 int main()
 {
-    std::cout << "Matrix A\n";
-    Matrix A(2, 3, true);
-    A.print();
+    NeuralNetwork nn;
+    nn.setLossFunction(Loss::MSE);
 
-    std::cout << "Sigmoid\n";
-    Matrix C = Matrix::applyFunction(A, Activation::sigmoid);
-    C.print();
+    // Simple feedforward NN
+    nn.addLayer(std::make_shared<Dense>(3, 4, Activation::RELU));
+    nn.addLayer(std::make_shared<Dense>(4, 1, Activation::SIGMOID));
 
-    std::cout << "tanh\n";
-    Matrix D = Matrix::applyFunction(A, Activation::tanh);
-    D.print();
+    // Fixed input and target
+    Matrix input(3, 1);
+    input.data = {
+        {0.5},
+        {0.1},
+        {0.4}};
 
-    std::cout << "ReLU\n";
-    Matrix E = Matrix::applyFunction(A, Activation::relu);
-    E.print();
+    Matrix target(1, 1);
+    target.data = {
+        {1.0}};
 
-    std::cout << "Sigmoid Derivative\n";
-    Matrix F = Matrix::applyFunction(C, Activation::sigmoid_derivative);
-    F.print();
+    std::cout << "Initial Output:\n";
+    Matrix initial = nn.forward(input);
+    initial.print();
 
-    std::cout << "tanh Derivative\n";
-    Matrix G = Matrix::applyFunction(A, Activation::tanh_derivative);
-    G.print();
+    // Train over multiple epochs
+    const int epochs = 1000;
+    const float lr = 0.1f;
 
-    std::cout << "ReLU Derivative\n";
-    Matrix H = Matrix::applyFunction(A, Activation::relu_derivative);
-    H.print();
+    for (int i = 0; i < epochs; ++i)
+    {
+        nn.train(input, target, lr);
+
+        if (i % 100 == 0)
+        {
+            double loss = nn.evaluate(input, target);
+            std::cout << "Epoch " << i << ", Loss: " << loss << "\n";
+        }
+    }
+
+    std::cout << "\nFinal Output after training:\n";
+    Matrix result = nn.forward(input);
+    result.print();
 
     return 0;
 }

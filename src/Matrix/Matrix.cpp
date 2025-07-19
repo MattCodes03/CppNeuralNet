@@ -39,6 +39,20 @@ Matrix Matrix::multiply(const Matrix &a, const Matrix &b)
     return result;
 }
 
+Matrix Matrix::multiply(const Matrix &m, float scalar)
+{
+    Matrix result = m;
+
+    for (size_t i = 0; i < m.rows; ++i)
+    {
+        for (size_t j = 0; j < m.cols; ++j)
+        {
+            result.data[i][j] *= scalar;
+        }
+    }
+    return result;
+}
+
 Matrix Matrix::transpose(const Matrix &m)
 {
     Matrix result(m.cols, m.rows);
@@ -107,6 +121,19 @@ Matrix Matrix::add(const Matrix &a, const Matrix &b)
     }
 
     return result;
+}
+
+double Matrix::sum(const Matrix &m)
+{
+    double total = 0.0;
+    for (size_t i = 0; i < m.rows; ++i)
+    {
+        for (size_t j = 0; j < m.cols; ++j)
+        {
+            total += m.data[i][j];
+        }
+    }
+    return total;
 }
 
 Matrix Matrix::subtract(const Matrix &a, const Matrix &b)
