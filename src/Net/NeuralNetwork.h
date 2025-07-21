@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <memory>
-#include "Matrix/Matrix.h"
+#include "Tensor/Tensor.h"
 #include "Interfaces/ILayer.h"
-#include "Loss.h"
+#include "Net/Loss.h" // Assuming you have a LossFunction struct/class
 
 class NeuralNetwork
 {
@@ -12,16 +12,20 @@ public:
     NeuralNetwork() = default;
 
     void addLayer(std::shared_ptr<ILayer> layer);
-    void setLossFunction(LossFunction lf) { lossFunction = lf; }
 
-    Matrix forward(const Matrix &input);
+    Tensor forward(const Tensor &input);
 
-    void backward(const Matrix &loss_gradient);
+    void backward(const Tensor &loss_gradient);
+
     void update_weights(float learning_rate);
-    void train(const Matrix &input, const Matrix &target, float learning_rate);
-    double evaluate(const Matrix &input, const Matrix &target);
+
+    void train(const Tensor &input, const Tensor &target, float learning_rate);
+
+    double evaluate(const Tensor &input, const Tensor &target);
+
+    void setLossFunction(const LossFunction &lossFn);
 
 private:
-    std::vector<std::shared_ptr<ILayer>> layers; // Store layers in the network
+    std::vector<std::shared_ptr<ILayer>> layers;
     LossFunction lossFunction;
 };

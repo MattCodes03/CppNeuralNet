@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Matrix/Matrix.h"
+#include "Tensor/Tensor.h"
+#include <functional>
 
 struct LossFunction
 {
-    using Func = std::function<double(const Matrix &, const Matrix &)>;
-    using DerivativeFunc = std::function<Matrix(const Matrix &, const Matrix &)>;
+    using Func = std::function<double(const Tensor &, const Tensor &)>;
+    using DerivativeFunc = std::function<Tensor(const Tensor &, const Tensor &)>;
 
     Func loss;
     DerivativeFunc derivative;
@@ -16,24 +17,24 @@ class Loss
 public:
     inline static const LossFunction MSE = {
         // MSE Loss function
-        [](const Matrix &predicted, const Matrix &target) -> double
+        [](const Tensor &predicted, const Tensor &target) -> double
         {
-            Matrix diff = Matrix::subtract(predicted, target); // diff = predicted - target
+            Tensor diff = Tensor::subtract(predicted, target); // predicted - target
 
-            // Square each element: diff^2
-            Matrix sqr = Matrix::applyFunction(diff, [](double x)
+            Tensor sqr = Tensor::applyFunction(diff, [](double x)
                                                { return x * x; });
 
-            return Matrix::sum(sqr) / (sqr.rows * sqr.cols); // Mean of squared errors
+            // Sum returns double (you'll need to implement this for Tensor)
+            return Tensor::sum(sqr) / (sqr.depth * sqr.rows * sqr.cols);
         },
 
         // Derivative of MSE w.r.t predicted output
-        [](const Matrix &predicted, const Matrix &target) -> Matrix
+        [](const Tensor &predicted, const Tensor &target) -> Tensor
         {
-            Matrix diff = Matrix::subtract(predicted, target); // diff = predicted - target
+            Tensor diff = Tensor::subtract(predicted, target);
 
-            // Multiply diff by scalar 2 / N, where N = total elements
-            float scalar = 2.0f / (predicted.rows * predicted.cols);
-            return Matrix::multiply(diff, scalar);
+            float scalar = 2.0f / (predicted.depth * predicted.rows * predicted.cols);
+
+            return Tensor::scale(diff, scalar);
         }};
 };

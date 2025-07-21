@@ -1,36 +1,45 @@
 #include "Dense.h"
 
-Dense::Dense(size_t inputSize, size_t outputSize, ActivationFunction activation) : weights(outputSize, inputSize, true),
-                                                                                   biases(outputSize, 1, true),
-                                                                                   activationFunction(activation)
+Dense::Dense(size_t inputSize, size_t outputSize, ActivationFunction activation)
+    : weights(Tensor::fromMatrix(Matrix(outputSize, inputSize, true))),
+      biases(Tensor::fromMatrix(Matrix(outputSize, 1, true))),
+      activationFunction(activation)
 {
 }
 
-Matrix Dense::forward(const Matrix &input)
+Tensor Dense::forward(const Tensor &input)
 {
-    lastInput = input; // Save input for weight gradient calc
+    lastInput = input;
 
-    // Perform the forward pass: output = weights * input + biases
-    Matrix z = Matrix::add(Matrix::multiply(weights, input), biases);
+    Matrix z = Matrix::add(Matrix::multiply(weights.toMatrix(), input.toMatrix()), biases.toMatrix());
 
-    // Apply the activation function
-    activatedOutput = activationFunction.apply(z);
+    // Activation is element-wise
+    Matrix activated = activationFunction.apply(z);
+
+    activatedOutput = Tensor::fromMatrix(activated);
     return activatedOutput;
 }
 
-Matrix Dense::backward(const Matrix &d_out)
+Tensor Dense::backward(const Tensor &d_out)
 {
-    Matrix d_activation = Matrix::hadamard(d_out, activationFunction.applyDerivative(activatedOutput));
+    Matrix d_activation = Matrix::hadamard(
+        d_out.toMatrix(),
+        activationFunction.applyDerivative(activatedOutput.toMatrix()));
 
-    d_weights = Matrix::multiply(d_activation, Matrix::transpose(lastInput));
+    // Gradients
+    d_weights = Tensor::fromMatrix(Matrix::multiply(
+        d_activation,
+        Matrix::transpose(lastInput.toMatrix())));
 
-    d_biases = d_activation; // Biases are simply the derivative of the output
+    d_biases = Tensor::fromMatrix(d_activation);
 
-    return Matrix::multiply(Matrix::transpose(weights), d_activation);
+    // Return grad to propagate to previous layer
+    Matrix grad_input = Matrix::multiply(Matrix::transpose(weights.toMatrix()), d_activation);
+    return Tensor::fromMatrix(grad_input);
 }
 
 void Dense::update_weights(float learning_rate)
 {
-    weights = Matrix::subtract(weights, Matrix::multiply(d_weights, learning_rate));
-    biases = Matrix::subtract(biases, Matrix::multiply(d_biases, learning_rate));
+    weights = Tensor::subtract(weights, Tensor::scale(d_weights, learning_rate));
+    biases = Tensor::subtract(biases, Tensor::scale(d_biases, learning_rate));
 }

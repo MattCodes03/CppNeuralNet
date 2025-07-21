@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Matrix/Matrix.h"
+#include "Tensor/Tensor.h"
 #include "Activation/Activation.h"
 #include "Layers/Dense.h"
 #include "Net/NeuralNetwork.h"
@@ -14,19 +14,19 @@ int main()
     nn.addLayer(std::make_shared<Dense>(3, 4, Activation::RELU));
     nn.addLayer(std::make_shared<Dense>(4, 1, Activation::SIGMOID));
 
-    // Fixed input and target
-    Matrix input(3, 1);
-    input.data = {
+    // Fixed input and target as Tensors (depth=1)
+    Tensor input = Tensor::fromMatrix(Matrix(3, 1));
+    input[0].data = {
         {0.5},
         {0.1},
         {0.4}};
 
-    Matrix target(1, 1);
-    target.data = {
+    Tensor target = Tensor::fromMatrix(Matrix(1, 1));
+    target[0].data = {
         {1.0}};
 
     std::cout << "Initial Output:\n";
-    Matrix initial = nn.forward(input);
+    Tensor initial = nn.forward(input);
     initial.print();
 
     // Train over multiple epochs
@@ -45,7 +45,7 @@ int main()
     }
 
     std::cout << "\nFinal Output after training:\n";
-    Matrix result = nn.forward(input);
+    Tensor result = nn.forward(input);
     result.print();
 
     return 0;

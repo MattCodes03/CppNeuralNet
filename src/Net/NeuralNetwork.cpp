@@ -5,9 +5,9 @@ void NeuralNetwork::addLayer(std::shared_ptr<ILayer> layer)
     layers.push_back(layer);
 }
 
-Matrix NeuralNetwork::forward(const Matrix &input)
+Tensor NeuralNetwork::forward(const Tensor &input)
 {
-    Matrix output = input;
+    Tensor output = input;
     for (const auto &layer : layers)
     {
         output = layer->forward(output);
@@ -15,9 +15,9 @@ Matrix NeuralNetwork::forward(const Matrix &input)
     return output;
 }
 
-void NeuralNetwork::backward(const Matrix &loss_gradient)
+void NeuralNetwork::backward(const Tensor &loss_gradient)
 {
-    Matrix gradient = loss_gradient;
+    Tensor gradient = loss_gradient;
 
     for (int i = static_cast<int>(layers.size()) - 1; i >= 0; --i)
     {
@@ -33,19 +33,25 @@ void NeuralNetwork::update_weights(float learning_rate)
     }
 }
 
-void NeuralNetwork::train(const Matrix &input, const Matrix &target, float learning_rate)
+void NeuralNetwork::train(const Tensor &input, const Tensor &target, float learning_rate)
 {
-    Matrix prediction = forward(input);
+    Tensor prediction = forward(input);
 
-    Matrix loss_grad = lossFunction.derivative(prediction, target);
+    Tensor loss_grad = lossFunction.derivative(prediction, target);
 
     backward(loss_grad);
 
     update_weights(learning_rate);
 }
 
-double NeuralNetwork::evaluate(const Matrix &input, const Matrix &target)
+double NeuralNetwork::evaluate(const Tensor &input, const Tensor &target)
 {
-    Matrix prediction = forward(input);
+    Tensor prediction = forward(input);
     return lossFunction.loss(prediction, target);
+}
+
+void NeuralNetwork::setLossFunction(const LossFunction &lossFn)
+{
+
+    lossFunction = lossFn;
 }
